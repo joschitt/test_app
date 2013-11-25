@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Device Properties Example</title>
-
-    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <title>PhoneGap Application </title>
+	<style>button{background:#333;color:#fff;border-radius:10px;border:2px #666 solid;}</style>
+    <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
     <script type="text/javascript" charset="utf-8">
 
     // Wait for device API libraries to load
@@ -13,18 +13,44 @@
     // device APIs are available
     //
     function onDeviceReady() {
-        var element = document.getElementById('deviceProperties');
-        element.innerHTML = 'Device Model: '    + device.model    + '<br />' +
-                            'Device Cordova: '  + device.cordova  + '<br />' +
-                            'Device Platform: ' + device.platform + '<br />' +
-                            'Device UUID: '     + device.uuid     + '<br />' +
-                            'Device Version: '  + device.version  + '<br />';
+        
+		function takePicture() {
+			navigator.device.capture.captureImage(captureSuccess, captureError);
+		}
+		
+		function captureSuccess(mediaFiles){
+			val i, len;
+			for (i=0,len=mediaFiles.length;i<len;i+=1){
+				uploadFile(mediaFiles[i]);
+			}
+		}
+		
+		function captureError(error){
+			var errMsg = 'An error has occured '+ error.code;
+			navigator.notification.alert(errMsg, null, 'oh No!');
+		}
+		
+		function uploadFile(mediaFile){
+			var ft = new FileTransfer(),  //fileTransfer to transfer to server
+				path = mediaFile.fullPath,
+				name = mediaFile.name;
+				ft.upload(
+						path, "http://www.curijo.com/test/upload.php",
+						function(result){
+							console.log('file upload: Success!')
+						},
+						function(error) {
+							console.log('file upload: Error!')
+						},
+						{fileName: name});
+			
+		}
+		
     }
 
     </script>
   </head>
   <body>
-	  <h1>My Device Info</h1>
-    <p id="deviceProperties">Loading device properties...</p>
+	  <button onclick="takePicture">Take Picture</button>
   </body>
 </html>
